@@ -1,0 +1,16 @@
+Necessary
+    1. Register page                         // {{host}}/auth/users/
+    2. Authorization page                    // {{host}}/auth/jwt/create/
+    3. Main page                             // {{host}}/api/messenger/main/
+    4. User profile page                     // {{host}}/api/messenger/user/profile/
+    5. User detail page (for other users)    // {{host}}/api/messenger/user/detail/<int:id>/
+    6. Search page                           // {{host}}/api/messenger/user/search/
+    7. Messages
+        7.1 Messages page                    // {{host}}/api/messenger/messages/send/<int:recepient_id>/
+        7.2 Put delete message page          // {{host}}/api/messenger/messages/put_delete/<id>/
+        7.3 Scheduled messages               // {{host}}/api/messenger/messages/scheduled_messages/<int:recepient_id>/
+    8. About us page                         // {{host}}/about_us/
+
+Secondary
+    1. Video call
+    2. Audio call

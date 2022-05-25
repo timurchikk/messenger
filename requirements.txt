@@ -1,0 +1,10 @@
+channels
+celery
+django
+django-celery-beat
+django-filter
+djangorestframework
+djoser
+psycopg2-binary
+pillow
+redis

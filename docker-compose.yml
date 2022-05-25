@@ -1,0 +1,69 @@
+version: "3.10"
+
+services:
+  db:
+    image: postgres
+    volumes: 
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=messenger_db
+      - POSTGRES_USER=m_user
+      - POSTGRES_PASSWORD=12345
+  django:
+    build: .
+    container_name: django
+    # command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python3 manage.py makemigrations &&
+             python3 manage.py migrate &&
+             python3 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+      - CELERY_BROKER=redis://redis:6379/0
+      - POSTGRES_DB=messenger_db
+      - POSTGRES_USER=m_user
+      - POSTGRES_PASSWORD=12345
+    depends_on:
+      - db
+      - redis
+
+  redis:
+    image: "redis:alpine"
+
+  celery:
+    restart: always
+    build: .
+    container_name: celery
+    command: celery -A messenger worker -l INFO
+    # volumes:
+    #     - /project
+    environment:
+        - DEBUG=1
+        - DB_HOST=db
+        - DB_NAME=messenger_db
+        - DB_USER=m_user
+        - POSTGRES_PASSWORD=12345
+        - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+        - CELERY_BROKER=redis://redis:6379/0
+    depends_on:
+        - db
+        - django
+        - redis 
+
+  celery-beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A messenger beat -l info
+    # volumes:
+    #   - ./project
+    environment:
+      - DEBUG=1
+      # - SECRET_KEY=o)$1s2&(!lc4hr+dx=c1^8o1la8a@u#$0ar^j^0c(ay4z&=m$z
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    depends_on:
+      - redis
